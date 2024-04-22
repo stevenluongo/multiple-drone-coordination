@@ -29,38 +29,6 @@ If it asks to download anything just click yes and continue, simulation should b
 <br/>
 <br/> 
 
-
-## Environment Variables
-
-### Create .env file and add the following:
-
-#### ACCESS_KEY
-This is the AWS Access Key ID used to authenticate requests to your AWS account with administrative permissions to S3.
-You can obtain this key by creating a new IAM user in your AWS Management Console with the necessary S3 permissions,
-and then generating a new Access Key ID for that user.
-
-#### SECRET_KEY
-This is the secret key paired with your AWS Access Key ID, used to securely authenticate requests.
-Obtain this secret key at the same time you create the Access Key ID in your AWS IAM dashboard.
-
-#### BUCKET_NAME
-This is the name of the S3 bucket where your files will be stored. Ensure the bucket is in the same region as your application to reduce latency.
-Create a bucket in the S3 section of your AWS Management Console or use an existing bucket's name.
-BUCKET_NAME=your_s3_bucket_name
-
-#### APPLICATION_ID
-This is the unique identifier for your application on Back4App, used to connect and interact with your cloud services.
-You can find this ID in your application settings on the Back4App website after you have registered and created an application.
-
-
-#### DATABASE_SECRET_KEY
-This key is used to authenticate access to your database on Back4App. It ensures that only your application can interact with its data.
-Similar to the Application ID, you can find this key in the settings of your application on the Back4App website.
-
-<br/>
-<br/>
-<br/> 
-
 ## Drone Survey & Segmentation
 
 ### Running the Survey
@@ -95,3 +63,47 @@ To configure your system to manage up to four drones, follow these steps for eac
    Replace 'Drone1' with the appropriate drone name based on the number of the drone (i.e., Drone2, Drone3, or Drone4).
 
 These steps will allow you to efficiently manage multiple drones, keeping in mind the significant resource requirements needed for smooth operation.
+
+
+<br/>
+<br/>
+<br/> 
+
+## Image Uploading Setup (Optional)
+
+To enable image uploading functionality in your project, you must configure several environment variables. Follow these steps to set up the necessary variables:
+
+### Step 1: Create Environment File
+Create a `.env` file in the root directory of your project and add the following environment variables:
+
+```plaintext
+ACCESS_KEY=your_aws_access_key_id
+SECRET_KEY=your_aws_secret_access_key
+BUCKET_NAME=your_s3_bucket_name
+APPLICATION_ID=your_back4app_application_id
+DATABASE_SECRET_KEY=your_back4app_database_secret_key
+```
+
+### Step 2: Configure AWS Credentials
+* AWS Access Key with S3 Admin Permissions:
+This key is used to authenticate requests to your AWS account with administrative permissions on S3.
+You can obtain this key by creating a new IAM user in your AWS Management Console with the necessary S3 permissions and then generating a new Access Key ID for that user.
+
+* AWS Secret Access Key with S3 Admin Permissions:
+This is the secret key paired with your AWS Access Key ID, used to securely authenticate requests.
+Obtain this secret key at the same time you create the Access Key ID in your AWS IAM dashboard.
+
+* AWS S3 Bucket Name:
+This is the name of the S3 bucket where your files will be stored. Ensure the bucket is in the same region as your application to reduce latency.
+Create a bucket in the S3 section of your AWS Management Console or use an existing bucket's name.
+
+### Step 3: Configure Back4App Settings
+* Back4App Application ID:
+This is the unique identifier for your application on Back4App, used to connect and interact with your cloud services.
+You can find this ID in your application settings on the Back4App website after you have registered and created an application.
+* Back4App Database Secret Key:
+This key is used to authenticate access to your database on Back4App. It ensures that only your application can interact with its data.
+Similar to the Application ID, you can find this key in the settings of your application on the Back4App website.
+
+### Step 4: Run the Application
+Once the environment variables are set, run the `drone_with_upload.py` script to start the drone and enable image uploading capabilities.
