@@ -6,10 +6,27 @@ import numpy as np
 import time
 from threading import Thread
 import os
+import boto3
 import uuid
 import asyncio
 import argparse
+import requests
+import json
 import pprint
+from dotenv import load_dotenv
+
+# Load the .env file
+load_dotenv()
+
+# Accessing variables
+ACCESS_KEY = os.getenv('ACCESS_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
+BUCKET_NAME = os.getenv('BUCKET_NAME')
+APPLICATION_ID = os.getenv('APPLICATION_ID')
+DATABASE_SECRET_KEY = os.getenv('DATABASE_SECRET_KEY')
+
+# DATABASE ENDPOINT URL
+ENDPOINT_URL = 'https://parseapi.back4app.com/classes/Drone'
 
 # Construct the absolute path to the directory of this script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +43,25 @@ with open(coco_names_path, 'r') as f:
 
 # generate different colors for different classes 
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
+
+def push_data(image, drone_id, status, people_found, coordinates):
+    data = {
+        'droneId': drone_id,
+        'status': status,
+        'peopleFound': people_found,
+        'coordinates': coordinates,
+        'droneImageUrl': image,  # Include the uploaded image URL
+    }
+    headers = {
+        'X-Parse-Application-Id': APPLICATION_ID,
+        'X-Parse-REST-API-Key': DATABASE_SECRET_KEY,
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(ENDPOINT_URL, headers=headers, data=json.dumps(data))
+    if response.status_code == 201:
+        print('Data pushed successfully')
+    else:
+        print(f'Error: {response.status_code}. Message: {response.text}')
 
 def generate_random_name_uuid(extension='.jpg'):
     extension='.jpg'
@@ -142,10 +178,29 @@ def segmentation(client: airsim.MultirotorClient, vehicle_name: str):
                 # write image to file
                 cv2.imwrite(filename, detected_image)
 
+                # upload image to AWS S3 bucket
+                try:
+                    # create client
+                    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+                    # upload file
+                    s3.upload_file(filename, BUCKET_NAME, filename)
+                    # format image URL
+                    uploaded_image_url = f'https://{BUCKET_NAME}.s3.amazonaws.com/{filename}'
+                    print('upload successful')
+                except Exception as e:
+                    print(f"Unexpected error during upload: {e}")
+
                 # get coordinates from lidar sensor
                 lidar_data = client.getLidarData(lidar_name=f'{vehicle_name}Lidar', vehicle_name=vehicle_name)
                 print("\t\tlidar x position: %s" % (pprint.pformat(int(lidar_data.pose.position.x_val))))
                 print("\t\tlidar y position: %s" % (pprint.pformat(int(lidar_data.pose.position.y_val))))
+                coordinates = f'{int(lidar_data.pose.position.x_val)}, {int(lidar_data.pose.position.y_val)}'
+
+                # push data to mobile app
+                try:
+                    push_data(uploaded_image_url, vehicle_name, 'Living', people_count, coordinates)
+                except Exception as e:
+                    print(f"Unexpected error during upload: {e}")
 
                 print("Person detected!")
                 # Show the image with detected people
