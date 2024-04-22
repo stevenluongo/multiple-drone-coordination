@@ -33,6 +33,10 @@ If it asks to download anything just click yes and continue, simulation should b
 
 ### Running the Survey
 
+#### Download yolo weights [here](https://pjreddie.com/media/files/yolov3.weights)
+
+* Place yolov3.weights inside the main directory
+
 Once the simulation environment is active, make sure to add in the environment variables and proceed by executing the `drone.py` file to initiate the drone's operations. Here’s what happens when you run the file:
 
 1. **Start of Survey**: The drone will launch and begin the survey process automatically.
