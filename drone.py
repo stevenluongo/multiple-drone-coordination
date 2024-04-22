@@ -314,13 +314,13 @@ async def main():
     arg_parser.add_argument("--coords", default=(45, -45, -12))
     args = arg_parser.parse_args()
 
-    drone_1 = SurveyNavigator(args, 'Drone1')
+    drone = SurveyNavigator(args, 'Drone1')
     # await drone to start
-    await drone_1.start()
+    await drone.start()
     # start drone surveying
-    drone_1.survey()
+    drone.survey()
     # fetch survey trip time
-    trip_time = drone_1.get_trip_time()
+    trip_time = drone.get_trip_time()
     # await trip time
     await asyncio.sleep(trip_time)
 
